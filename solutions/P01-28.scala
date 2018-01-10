@@ -124,7 +124,7 @@ object P07 {
     // Using flatMap. The most concise way to solve this is recursion.
     def flatten1(ls: List[Any]): List[Any] = ls flatMap {
         case ms: List[_] => flatten1(ms)
-        case e => List(e)
+        case e           => List(e)
     }
     // This code is a little bit confusing when firstly been looked at.
     // Logic explained:
@@ -136,10 +136,38 @@ object P07 {
 
 // P08 Eliminate consecutive duplicates of list elements.
 object P08 {
-    def compress[T](ls: List[T]): List[T] = ls match {
-
+    // Using builtin dropWhile and recursion
+    def compressRecursive[T](ls: List[T]): List[T] = ls match {
+        case Nil       => Nil
+        case h :: tail => h :: compressRecursive(tail.dropWhile(_ == h)) // this is not tail recursion
     }
-}
+
+    // Tail recursion (author version)
+    def compressTail1[T](ls: List[T]): List[T] = {
+        def loop[T](res: List[T], cur: List[T]): List[T] = cur match {
+            case h :: tail => loop(h :: res, tail.dropWhile(_ == h))
+            case Nil       => res.reverse
+        }
+        loop(Nil, ls)
+    }
+
+    // Remove the reverse version
+    def compressTail2[T](ls: List[T]): List[T] = {
+        def loop[T](res: List[T], cur: List[T]): List[T] = cur match {
+            case h :: tail => loop(res ::: List[T](h), tail.dropWhile(_ == h))
+            case Nil       => res
+        }
+        loop(Nil, ls)
+    }
+
+    // Functional
+    def compressFunctional1[T](ls: List[T]): List[T] =
+        ls.foldRight(List[T]()) { (h, r) =>
+            if (r.isEmpty || r.head != h) h :: r
+            else r
+        }
+    // Or, using the fold right symbol:
+    def compressFunction2[T](ls: List[T]): List[T] =
 
 
 
