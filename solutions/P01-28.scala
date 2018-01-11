@@ -139,7 +139,8 @@ object P08 {
     // Using builtin dropWhile and recursion
     def compressRecursive[T](ls: List[T]): List[T] = ls match {
         case Nil       => Nil
-        case h :: tail => h :: compressRecursive(tail.dropWhile(_ == h)) // this is not tail recursion
+        case h :: tail => h :: compressRecursive(tail.dropWhile(_ == h))
+        // this is not tail recursion
     }
 
     // Tail recursion (author version)
@@ -168,6 +169,41 @@ object P08 {
         }
     // Or, using the fold right symbol:
     def compressFunction2[T](ls: List[T]): List[T] =
+        (List[T]() :\ ls) { (h, r) =>
+            if (r.isEmpty || r.head != h) h :: r
+            else r
+        }
+}
 
+// P09 Pack consecutive duplicates of list elements into sublists.
+object P09 {
+    // Using 'span' builtin to do the job
+    // It is not tail recursion optimized
+    def pack1[T](ls: List[T]): List[List[T]] = {
+        if (ls.isEmpty) List(List())
+        else {
+            val (cur, rem) = ls.span(_ == ls.head)
+            if (rem.isEmpty) List(cur)
+            else cur :: pack1(rem)
+        }
+    }
+
+    // Tail recursion version
+    def pack2[T](ls: List[T]): List[List[T]] = {
+        def loop[T](packed: List[List[T]], rest: List[T]): List[List[T]] =
+            (packed, rest) match {
+                case (_, Nil) => packed
+                case (_, ls)  => loop(packed :+ ls.takeWhile(_ == ls.head), ls.dropWhile(_ == ls.head))
+        }
+        loop(Nil, ls)
+    }
+}
+
+// P10 Run-length encoding of a list.
+object P10 {
+    def encode[T](ls: List[T]): List[(Int, T)] = {
+        // to be done
+    }
+}
 
 
