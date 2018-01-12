@@ -250,9 +250,63 @@ object P11 {
 
 // P12 Decode a run-length encoded list.
 object P12 {
-    def decode[T](encoded: List[(Int, T)]): List[T] = {
+    def decode[T](encoded: List[(Int, T)]): List[T] =
+        encoded flatMap {
+            e => List.fill(e._1)(e._2)
+        }
+}
+
+// P13 Run-length encoding of a list (direct solution).
+object P13 {
+    // already implemented in P10.
+    // To be frank, my implementation is better than author's:
+    def encodeDirect[A](ls: List[A]): List[(Int, A)] =
+        if (ls.isEmpty) Nil
+        else {
+          val (packed, next) = ls span { _ == ls.head }
+          (packed.length, packed.head) :: encodeDirect(next)
+        }
+}
+
+// P14 Duplicate the elements of a list.
+object P14 {
+    // Tail recursion version
+    def duplicate[T](ls: List[T]): List[T] = {
+        def loop[T](former: List[T], latter: List[T]): List[T] = {
+            (former, latter) match {
+                case (_, Nil)   => former
+                case (res, rem) => loop(res :+ rem.head :+ rem.head, rem.tail)
+            }
+        }
+        loop(Nil, ls)
+    }
+
+    // Using builtin 'flatMap' is most concise and simple:
+    def duplicateOneline[T](ls: List[T]): List[T] = ls flatMap(e => List(e, e))
+}
+
+// P15 Duplicate the elements of a list a given number of times.
+object P15 {
+    // Using while loop (cumbersome)
+    def duplicateN[T](n: Int, ls: List[T]): List[T] =
+        ls flatMap(e => List.fill(n)(e))
+    // or, ls flatMap(List.fill(n)(_)) is also ok
+}
+
+// P16 Drop every Nth element from a list.
+object P16 {
+    // Using builtin 'filter'. Oh dear it's tricky.
+    def drop[T](n: Int, ls: List[T]): List[T] =
+        List.range(1, ls.size + 1) filter {e => e % n != 0} map {i => ls(i-1)}
+
+    // Author way of functional:
+    def dropFunctional[T](n: Int, ls: List[T]): List[T] =
+        ls.zipWithIndex filter {v => (v._2 + 1) % n != 0} map {_._1}
+    // It's obvious my version is cleverer!
+
+    // Always can use recursive method:
+    def dropTailRecursive[T](n: Int, ls: List[T]): List[T] = {
         // to be done
     }
 }
-
 
