@@ -128,8 +128,8 @@ object P07 {
     }
     // This code is a little bit confusing when firstly been looked at.
     // Logic explained:
-    // (1) flatMap can only applied in the case when the element of a list is also a list
-    // (2) The key idea is to flat the list into 1 layer nested list, that is of form:
+    // (1) flatMap can only applied when the element of a list is also a list
+    // (2) The key is to flat the list into 1 layer nested list:
     // List(List(), list(), ..., list())
     // (3) Then the normal flatMap operation can be applied.
 }
@@ -193,7 +193,8 @@ object P09 {
         def loop[T](packed: List[List[T]], rest: List[T]): List[List[T]] =
             (packed, rest) match {
                 case (_, Nil) => packed
-                case (_, ls)  => loop(packed :+ ls.takeWhile(_ == ls.head), ls.dropWhile(_ == ls.head))
+                case (_, ls)  => loop(packed :+ ls.takeWhile(_ == ls.head),
+                                                ls.dropWhile(_ == ls.head))
         }
         loop(Nil, ls)
     }
@@ -201,7 +202,55 @@ object P09 {
 
 // P10 Run-length encoding of a list.
 object P10 {
+    // Independent implementation (Tail recursive)
     def encode[T](ls: List[T]): List[(Int, T)] = {
+        def loop[T](packed: List[(Int, T)], rest: List[T]): List[(Int, T)] =
+            (packed, rest) match {
+                case (_, Nil) => packed
+                case (_, ls)  =>
+                    loop(packed :+ (ls.takeWhile(_ == ls.head).size, ls.head),
+                                                ls.dropWhile(_ == ls.head))
+        }
+        loop(Nil, ls)
+    }
+
+    // Or, more concisely:
+    import P09.pack1 // or pack2
+    def encodeShort[T](ls: List[T]): List[(Int, T)] =
+        pack(ls) map { e => (e.lenght, e.head) }
+}
+
+// P11 Modified run-length encoding.
+object P11 {
+    // Ugly implementation of mine
+    def encodeModified[T](ls: List[T]): List[Any] = {
+        def loop[T](packed: List[Any], rest: List[T]): List[Any] =
+            (packed, rest) match {
+                case (_, Nil) => packed
+                case (_, h :: tail) if (h != tail.head) =>
+                    loop(packed :+ h, tail)
+                case (_, ls)  =>
+                    loop(packed :+ (ls.takeWhile(_ == ls.head).size, ls.head),
+                                                ls.dropWhile(_ == ls.head))
+        }
+        loop(Nil, ls)
+    }
+
+    // On the basis of P10:
+    import P10.encode
+    def encodeModified2[T](ls: List[T]): List[Any] =
+        encode(ls) map { t => if (t._1 == 1) t._2 else t}
+
+    // Type safer version by the author.
+    def encodeModified2[A](ls: List[A]): List[Either[A, (Int, A)]] =
+        encode(ls) map {
+            t => if (t._1 == 1) Left(t._2) else Right(t)
+        }
+}
+
+// P12 Decode a run-length encoded list.
+object P12 {
+    def decode[T](encoded: List[(Int, T)]): List[T] = {
         // to be done
     }
 }
