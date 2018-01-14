@@ -304,9 +304,42 @@ object P16 {
         ls.zipWithIndex filter {v => (v._2 + 1) % n != 0} map {_._1}
     // It's obvious my version is cleverer!
 
-    // Always can use recursive method:
+    // Always can use a recursive approach:
     def dropTailRecursive[T](n: Int, ls: List[T]): List[T] = {
-        // to be done
+        def loop[T](cd: Int, remain: List[T], result: List[T]): List[T] =
+            (cd, remain) match {
+                case (_, Nil)       => result.reverse
+                case (1, _ :: tail) => loop(n, tail, result)
+                case (_, h :: tail) => loop(cd-1, tail, h :: result)
+            }
+        loop(n, ls, Nil)
     }
 }
 
+// P17 Split a list into two parts.
+object P17 {
+    // Using builtin 'splitAt'
+    def split[T](p: Int, ls: List[T]): (List[T], List[T]) = ls.splitAt(p)
+
+    // Using recursion
+    def splitR[T](p: Int, ls: List[T]): (List[T], List[T]) = {
+        def loop[T](cd: Int, cur: List[T], res: List[T]): (List[T], List[T]) =
+            (cd, cur) match {
+                case (_, Nil)       => (res.reverse, cur)
+                case (0, _ :: tail) => (res.reverse, cur)
+                case (_, h :: tail) => loop(cd-1, tail, h :: res)
+            }
+        loop(p, ls, Nil)
+    }
+
+    // An interesting way by the author:
+    def splitF[T](p: Int, ls: List[T]): (List[T], List[T]) =
+        (ls.take(p), ls.drop(p))
+}
+
+// P18 Extract a slice from a list.
+object P18 {
+    // Using simple builtin
+    def slice[T](low: Int, high: Int, ls: List[T]): List[T] =
+        (ls.drop(low).take(high-low)
+}
