@@ -340,21 +340,67 @@ object P17 {
 // P18 Extract a slice from a list.
 object P18 {
     // Using simple builtin
-    def slice1[T](low: Int, high: Int, ls: List[T]): List[T] =
-        (ls.drop(low).take(high-low)
+    def slice1[T](start: Int, end: Int, ls: List[T]): List[T] =
+        (ls.drop(start).take(end-start)
 
-    def slice2[T](low: Int, high: Int, ls: List[T]): List[T] =
+    def slice2[T](start: Int, end: Int, ls: List[T]): List[T] =
         ls.slice(start, end)
 
     // Using tail recursion
-    def sliceRecursive[T](low: Int, high: Int, ls: List[T]): List[T] = {
-        def loop(count: Int, curList: List[A], result: List[A]): List[A] =
-          (count, curList) match {
-            case (_, Nil)                     => result.reverse
-            case (c, h :: tail) if end <= c   => result.reverse
-            case (c, h :: tail) if start <= c => loop(c + 1, tail, h :: result)
-            case (c, _ :: tail)               => loop(c + 1, tail, result)
-          }
+    def sliceRecursive[T](start: Int, end: Int, ls: List[T]): List[T] = {
+        def loop(count: Int, curList: List[A], res: List[A]): List[A] =
+            (count, curList) match {
+                case (_, Nil)                     => res.reverse
+                case (c, h :: t) if (end <= c)   => res.reverse
+                case (c, h :: t) if (start <= c) => loop(c+1, t, h :: res)
+                case (c, _ :: t)               => loop(c+1, t, res)
+                }
         loop(0, ls, Nil)
+    }
+}
+
+// P19 Rotate a list N places to the left.
+object P19 {
+    def rotate[T](pivot: Int, ls: List[T]): List[T] = {
+        // to be done
+    }
+}
+
+// P20 Remove the Kth element from a list.
+object P20 {
+    // Standard method
+    def removeAt1[T](n: Int, ls: List[T]): (List[T], T) =
+        ls.splitAt(n) match {
+            case (Nil, _) if n < 0 => throw new NoSuchElementException
+            case (pre, e :: post) => (pre ::: post, e)
+            case (pre, Nil) => throw new NoSuchElementException
         }
+
+
+    // Using less builtin. But it's less concise
+    def removeAt2[T](n: Int, ls: List[T]): (List[T], T) = {
+        if (n < 0) throw new NoSuchElementException
+        else (n, ls) match {
+            case (_, Nil) => throw new NoSuchElementException
+            case (0, h :: tail) => (tail, h)
+            case (_, h :: tail) => {
+                val (t, e) = removeAt2(n-1, ls.tail)
+                (ls.head :: t, e)
+            }
+        }
+    }
+}
+
+// P21 Insert an element at a given position into a list.
+object P21 {
+    def insertAt[T](num: T, n: Int, ls: List[T]): List[T] = splitAt(n) match {
+
+    }
+}
+
+// P22 Create a list containing all integers within a given range.
+object P22 {
+    def range(start: Int, end: Int): List[Int] = {
+
+    }
 }
