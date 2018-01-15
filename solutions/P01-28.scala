@@ -340,6 +340,21 @@ object P17 {
 // P18 Extract a slice from a list.
 object P18 {
     // Using simple builtin
-    def slice[T](low: Int, high: Int, ls: List[T]): List[T] =
+    def slice1[T](low: Int, high: Int, ls: List[T]): List[T] =
         (ls.drop(low).take(high-low)
+
+    def slice2[T](low: Int, high: Int, ls: List[T]): List[T] =
+        ls.slice(start, end)
+
+    // Using tail recursion
+    def sliceRecursive[T](low: Int, high: Int, ls: List[T]): List[T] = {
+        def loop(count: Int, curList: List[A], result: List[A]): List[A] =
+          (count, curList) match {
+            case (_, Nil)                     => result.reverse
+            case (c, h :: tail) if end <= c   => result.reverse
+            case (c, h :: tail) if start <= c => loop(c + 1, tail, h :: result)
+            case (c, _ :: tail)               => loop(c + 1, tail, result)
+          }
+        loop(0, ls, Nil)
+        }
 }
