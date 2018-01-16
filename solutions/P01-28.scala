@@ -1,5 +1,5 @@
 // Problem 1 to 28
-// These problems are all related to
+// These problems are all related to list operation in Scala
 
 // P01 Find the last element of a list.
 object P01 {
@@ -361,8 +361,19 @@ object P18 {
 
 // P19 Rotate a list N places to the left.
 object P19 {
-    def rotate[T](pivot: Int, ls: List[T]): List[T] = {
-        // to be done
+    // Patern matching approach
+    def rotate[T](p: Int, ls: List[T]): List[T] = (p, ls) match {
+        case (_, Nil)               => ls
+        case (neg, ls) if (neg < 0) => rotate(neg % ls.size + ls.size, ls)
+        case (pos, ls) if (pos > 0) =>
+            ls.drop(pos % ls.size) ::: ls.take(pos % ls.size)
+    }
+
+    // The author's approach
+    def rotate[A](n: Int, ls: List[A]): List[A] = {
+        val nBounded = if (ls.isEmpty) 0 else n % ls.length
+        if (nBounded < 0) rotate(nBounded + ls.length, ls)
+        else (ls drop nBounded) ::: (ls take nBounded)
     }
 }
 
@@ -394,13 +405,112 @@ object P20 {
 // P21 Insert an element at a given position into a list.
 object P21 {
     def insertAt[T](num: T, n: Int, ls: List[T]): List[T] = splitAt(n) match {
-
+        case (prev, post) => prev ::: num ::: post
     }
-}
 
 // P22 Create a list containing all integers within a given range.
 object P22 {
-    def range(start: Int, end: Int): List[Int] = {
+    // builtin method
+    def rangeBuiltin(start: Int, end: Int): List[Int] = range(start, end+1)
 
+    // recursive method
+    def rangeRecursive(start: Int, end: Int): List[Int] =
+        if (end < start) Nil
+        else start :: rangeRecursive(start + 1, end)
+
+    // tail recursive
+    def rangeTail(start: Int, end: Int): List[Int] = {
+        def loop(end: Int, res: List[Int]): List[Int] = {
+            if (end < start) res
+            else loop(end-1, end :: result)
+        }
+        loop(end, Nil)
+    }
+
+    // Functional approach (the concept of 'unfoldr')
+    // This concept is originated in Haskell. I checked a little bit that lang.
+    // Isn't the name of language imply "ask hell" ? Shaking in horror.
+    def unfoldRight[A, B](s: B)(f: B => Option[(A, B)]): List[A] =
+        f(s) match {
+            case None         => Nil
+            case Some((r, n)) => r :: unfoldRight(n)(f)
+        }
+    def rangeFunctional(start: Int, end: Int): List[Int] =
+        unfoldRight(start)({ n =>
+            if (n > end) None
+            else Some((n, n+1))
+        })
+}
+
+// P23 Extract a given number of randomly selected elements from a list.
+object P23 {
+    // Using function in P20
+    import P20.removeAt1
+    def randomSelect[T](n: Int, ls: List[T]): List[T] =
+        if (n <= 0) Nil
+        else {
+            val (rest, e) = removeAt1((new util.Random).nextInt(ls.size), ls)
+            e ::  randomSelect(n-1, rest)
+        }
+    // Tail recursion version
+    // TODO: this is wrong!
+    def randomSelectTail[T](n: Int, ls: List[T]): List[T] = {
+        def loop[T](n: Int, res: List[T], rem: List[T], r: util.Random): List[T] =
+            (n, res, rem) match {
+                case (neg, _, _) if (neg <= 0) => Nil
+                case (pos, _, Nil) => Nil
+                case (pos, _, _) => {
+                    val (rest, e) = removeAt1(r.nextInt(rem.size), rem)
+                    loop(n-1, e :: res, rest, r)
+                }
+            }
+        loop(n, Nil, ls, (new util.Random))
     }
 }
+
+// P24 Lotto: Draw N different random numbers from the set 1..M.
+object P24 {
+
+}
+
+// P25 Generate a random permutation of the elements of a list.
+object P25 {
+
+}
+
+// P26 Generate the combinations of K distinct objects chosen from
+// the N elements of a list.
+object P26 {
+
+}
+
+// P27 Group the elements of a set into disjoint subsets.
+// a) In how many ways can a group of 9 people work in 3 disjoint subgroups of
+// 2, 3 and 4 persons? Write a function that generates all the possibilities.
+object P27a {
+
+}
+
+// b) Generalize the above predicate in a way that we can specify a list of
+// group sizes and the predicate will return a list of groups.
+object P27b {
+
+}
+
+// P28 Sorting a list of lists according to length of sublists.
+// a) We suppose that a list contains elements that are lists themselves.
+// The objective is to sort the elements of the list according to their length.
+// E.g. short lists first, longer lists later, or vice versa.
+object P28a {
+
+}
+
+// b) Again, we suppose that a list contains elements that are lists themselves.
+// But this time the objective is to sort the elements according to their length
+// frequency; i.e. in the default, sorting is done ascendingly, lists with rare
+// lengths are placed, others with a more frequent length come later.
+object P28b {
+
+}
+
+
