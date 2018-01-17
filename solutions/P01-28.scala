@@ -479,7 +479,10 @@ object P24 {
 
 // P25 Generate a random permutation of the elements of a list.
 object P25 {
-
+    // Using result of P23
+    import P23.randomSelectTail
+    def randomPermute[T](ls: List[T]): List[T] =
+        randomSelectTail(ls.size, ls)
 }
 
 // P26 Generate the combinations of K distinct objects chosen from
