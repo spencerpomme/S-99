@@ -446,20 +446,21 @@ object P22 {
 object P23 {
     // Using function in P20
     import P20.removeAt1
-    def randomSelect[T](n: Int, ls: List[T]): List[T] =
+    def randomSelect[T](n: Int, ls: List[T]): List[T] = {
         if (n <= 0) Nil
         else {
             val (rest, e) = removeAt1((new util.Random).nextInt(ls.size), ls)
-            e ::  randomSelect(n-1, rest)
+            e :: randomSelect(n-1, rest)
         }
+    }
+
     // Tail recursion version
-    // TODO: this is wrong!
     def randomSelectTail[T](n: Int, ls: List[T]): List[T] = {
         def loop[T](n: Int, res: List[T], rem: List[T], r: util.Random): List[T] =
-            (n, res, rem) match {
-                case (neg, _, _) if (neg <= 0) => Nil
-                case (pos, _, Nil) => Nil
-                case (pos, _, _) => {
+            (n, rem) match {
+                case (neg, _) if (neg <= 0) => res
+                case (_, Nil)               => res
+                case (pos, _) if (pos > 0)  => {
                     val (rest, e) = removeAt1(r.nextInt(rem.size), rem)
                     loop(n-1, e :: res, rest, r)
                 }
@@ -470,7 +471,10 @@ object P23 {
 
 // P24 Lotto: Draw N different random numbers from the set 1..M.
 object P24 {
-
+    // Using result of P23
+    import P23.randomSelectTail
+    def lotto(n: Int, range: Int): List[Int] =
+        randomSelectTail(n, List.range(1, range+1))
 }
 
 // P25 Generate a random permutation of the elements of a list.
